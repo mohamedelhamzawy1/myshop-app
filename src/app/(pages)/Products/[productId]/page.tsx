@@ -24,7 +24,7 @@ import AddToCart from '@/components/AddToCart/AddToCart';
 import RatingStars from '@/components/RatingStars/RatingStars';
 export default async function ProductDetails({params}: { params : Params }) {
 
-    let {productId}= params;
+    const {productId}= params;
 
     const response = await fetch('https://ecommerce.routemisr.com/api/v1/products/'+productId);
 

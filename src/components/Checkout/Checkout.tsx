@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Checkout({ cartId }: { cartId: string }) {
-  let detailsInput = useRef<HTMLInputElement>(null);
+  const detailsInput = useRef<HTMLInputElement>(null);
   let cityInput = useRef<HTMLInputElement>(null);
   let phoneInput = useRef<HTMLInputElement>(null);
 

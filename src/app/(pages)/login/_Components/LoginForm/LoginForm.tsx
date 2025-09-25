@@ -30,7 +30,7 @@ export function LoginForm() {
 
     const [isLoading,setIsLoading]=useState<boolean>(false)
 
-    let searchParams=useSearchParams();
+    const searchParams=useSearchParams();
 
    // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
