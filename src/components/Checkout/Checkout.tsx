@@ -17,8 +17,8 @@ import toast, { Toaster } from "react-hot-toast";
 
 export default function Checkout({ cartId }: { cartId: string }) {
   const detailsInput = useRef<HTMLInputElement>(null);
-  let cityInput = useRef<HTMLInputElement>(null);
-  let phoneInput = useRef<HTMLInputElement>(null);
+  const cityInput = useRef<HTMLInputElement>(null);
+  const phoneInput = useRef<HTMLInputElement>(null);
 
   const token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjZlMzFlY2E0NWFiOWY5MWEwZWNlMCIsIm5hbWUiOiJBZGFtIE1vaGFtZWQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1ODM5NzA4NCwiZXhwIjoxNzY2MTczMDg0fQ.AI64KFTTJ5PsnP4gL1ynKlR81IwFQqyHTO7JTO4UHuA";
