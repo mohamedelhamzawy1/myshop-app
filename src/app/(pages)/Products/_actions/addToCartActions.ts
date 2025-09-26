@@ -21,9 +21,14 @@ export async function addToCartServer(productId: string) {
 
     const data = await res.json();
     return data;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    
+  if (err instanceof Error) {
     return { status: "error", message: err.message };
   }
+  return { status: "error", message: String(err) };
+}
+
 }
 
 
