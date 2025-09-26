@@ -16,10 +16,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Loader2, ShoppingCart, UserIcon } from "lucide-react"
-import { Badge } from "../ui/badge"
+import { Badge } from "../../ui/badge"
 import { usePathname } from "next/navigation";
-import { CartContext } from "../Context/cartContext"
-import { useSearch } from "../Context/searchcontext"  // <-- import context
+import { CartContext } from "../cartContext"
+import { useSearch } from "../searchcontext"  // <-- import context
 import { signOut, useSession } from "next-auth/react"
 
 export default function Navbar() {

@@ -1,9 +1,11 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import { ProductI } from "@/interfaces/product";
 import toast from "react-hot-toast";
-import { getUserToken } from "@/types/getUserToken/getUserToken";
+import { getWishlistServer } from "@/app/(pages)/wishlist/_actions/getWishlistAction";
+import { addToWishlistServer } from "@/app/(pages)/wishlist/_actions/addToWishlistAction";
+import { removeFromWishlistServer } from "@/app/(pages)/wishlist/_actions/removeFromWishlistAction";
 
 export const WishlistContext = createContext<{
   wishlistData: ProductI[] | null;
@@ -24,70 +26,39 @@ export const WishlistContext = createContext<{
 });
 
 export default function WishlistContextProvider({ children }: { children: ReactNode }) {
-   
   const [wishlistData, setWishlistData] = useState<ProductI[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useContext(WishlistContext);
-
-  
-
   async function getWishlist() {
-    const token=await getUserToken()
-    try {
-      const response = await fetch("https://ecommerce.routemisr.com/api/v1/wishlist", {
-        headers:{ 
-          token: token+'',
-      }
-    });
-      const data = await response.json();
-      setWishlistData(data?.data || []);
-    } catch (error) {
-      console.error("Get wishlist failed:", error);
-    } finally {
-      setIsLoading(false);
+    setIsLoading(true);
+    const data = await getWishlistServer();
+    if (data?.data) {
+      setWishlistData(data.data);
+    } else {
+      setWishlistData([]);
     }
+    setIsLoading(false);
   }
 
   async function addToWishlist(productId: string) {
-     const token=await getUserToken()
-    try {
-      const response = await fetch("https://ecommerce.routemisr.com/api/v1/wishlist", {
-        method: "POST",
-        headers: {
-          token:token+'',
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ productId }),
-      });
-      const data = await response.json();
-
-      if (data?.data) {
-        setWishlistData(data.data);     
-           toast.success("Added successfully to wishlist");
-
-      } else {
-        setWishlistData((prev) => prev ? [...prev, { id: productId } as ProductI] : [{ id: productId } as ProductI]);
-      }
-    } catch (error) {
-      console.error("Add to wishlist failed:", error);
+    const data = await addToWishlistServer(productId);
+    if (data?.data) {
+      setWishlistData(data.data);
+      toast.success("Added successfully to wishlist");
+    } else {
+      toast.error(data?.message || "Failed to add to wishlist");
     }
   }
 
   async function removeFromWishlist(productId: string) {
-     const token=await getUserToken()
-    try {
-      await fetch(
-        `https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`,
-        {
-          method: "DELETE",
-          headers: { token:token+'' },
-        }
+    const data = await removeFromWishlistServer(productId);
+    if (data?.status === "success") {
+      setWishlistData((prev) =>
+        prev ? prev.filter((item) => item.id !== productId) : []
       );
-      setWishlistData((prev) => prev ? prev.filter((item) => item.id !== productId) : []);
-       toast.success("Removed successfully from wishlist");
-    } catch (error) {
-      console.error("Remove from wishlist failed:", error);
+      toast.success("Removed successfully from wishlist");
+    } else {
+      toast.error(data?.message || "Failed to remove from wishlist");
     }
   }
 
