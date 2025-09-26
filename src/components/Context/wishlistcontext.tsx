@@ -3,6 +3,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { ProductI } from "@/interfaces/product";
 import toast from "react-hot-toast";
+import { getUserToken } from "@/types/getUserToken/getUserToken";
 
 export const WishlistContext = createContext<{
   wishlistData: ProductI[] | null;
@@ -23,19 +24,22 @@ export const WishlistContext = createContext<{
 });
 
 export default function WishlistContextProvider({ children }: { children: ReactNode }) {
+   
   const [wishlistData, setWishlistData] = useState<ProductI[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useContext(WishlistContext);
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjZlMzFlY2E0NWFiOWY5MWEwZWNlMCIsIm5hbWUiOiJBZGFtIE1vaGFtZWQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1ODM5NzA4NCwiZXhwIjoxNzY2MTczMDg0fQ.AI64KFTTJ5PsnP4gL1ynKlR81IwFQqyHTO7JTO4UHuA";
+  
 
   async function getWishlist() {
+    const token=await getUserToken()
     try {
       const response = await fetch("https://ecommerce.routemisr.com/api/v1/wishlist", {
-        headers: { token },
-      });
+        headers:{ 
+          token: token+'',
+      }
+    });
       const data = await response.json();
       setWishlistData(data?.data || []);
     } catch (error) {
@@ -46,11 +50,12 @@ export default function WishlistContextProvider({ children }: { children: ReactN
   }
 
   async function addToWishlist(productId: string) {
+     const token=await getUserToken()
     try {
       const response = await fetch("https://ecommerce.routemisr.com/api/v1/wishlist", {
         method: "POST",
         headers: {
-          token,
+          token:token+'',
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ productId }),
@@ -70,12 +75,13 @@ export default function WishlistContextProvider({ children }: { children: ReactN
   }
 
   async function removeFromWishlist(productId: string) {
+     const token=await getUserToken()
     try {
       await fetch(
         `https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`,
         {
           method: "DELETE",
-          headers: { token },
+          headers: { token:token+'' },
         }
       );
       setWishlistData((prev) => prev ? prev.filter((item) => item.id !== productId) : []);

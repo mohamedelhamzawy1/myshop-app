@@ -32,8 +32,8 @@ export default function Navbar() {
 
   return (
     <nav className="py-3 bg-gray-200 font-semibold sticky top-0 z-50" >
-      <div className="container mx-auto">
-        <div className="flex items-center justify-around">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 sm:justify-around">
           <h1> <Link href={'/'}> MyShop</Link></h1>
 
           <NavigationMenu>
@@ -67,13 +67,14 @@ export default function Navbar() {
           <label htmlFor="search" className="sr-only">
             Search
           </label>
-         <input
-    type="text"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    placeholder="Search products..."
-    className="border border-gray-400 rounded px-9 py-1 ml-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-  />
+        <input
+  type="text"
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  placeholder="Search products..."
+  className="border border-gray-400 rounded px-4 py-1 ml-0 w-full max-w-xs sm:ml-4 sm:w-auto focus:outline-none focus:ring-2 focus:ring-blue-400"
+/>
+
         </div>
       )}
           <div className="flex items-center gap-6">
