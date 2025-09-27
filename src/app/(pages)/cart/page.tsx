@@ -258,7 +258,7 @@ export default function Cart() {
                   </span>
                 </div>
 
-                <Checkout cartId={cartData?.cartId} />
+                <Checkout cartID={cartData?.cartId} />
 
                 <Link href={"/Products"}>
                   <Button

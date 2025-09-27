@@ -13,66 +13,38 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+import { createCheckout } from "@/app/actions/checkoutActions";
 
-export default function Checkout({ cartId }: { cartId: string }) {
+export default function Checkout({ cartID }: { cartID: string }) {
   const detailsInput = useRef<HTMLInputElement>(null);
   const cityInput = useRef<HTMLInputElement>(null);
   const phoneInput = useRef<HTMLInputElement>(null);
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjZlMzFlY2E0NWFiOWY5MWEwZWNlMCIsIm5hbWUiOiJBZGFtIE1vaGFtZWQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1ODM5NzA4NCwiZXhwIjoxNzY2MTczMDg0fQ.AI64KFTTJ5PsnP4gL1ynKlR81IwFQqyHTO7JTO4UHuA";
-
   function getShippingAddress() {
     return {
-      details: detailsInput.current?.value,
-      city: cityInput.current?.value,
-      phone: phoneInput.current?.value,
+      details: detailsInput.current?.value || "",
+      city: cityInput.current?.value || "",
+      phone: phoneInput.current?.value || "",
     };
   }
 
-  async function checkoutOnline() {
-    const shippingAddress = getShippingAddress();
+  async function checkout(method: "online" | "cash") {
+    try {
+      const data = await createCheckout(cartID, getShippingAddress(), method);
+      console.log("Checkout response:", data);
 
-    const response = await fetch(
-      `https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${cartId}?url=http://localhost:3000`,
-      {
-        method: "POST",
-        body: JSON.stringify({ shippingAddress }),
-        headers: {
-          token,
-          "content-type": "application/json",
-        },
+      if (method === "online" && data.status === "success") {
+        window.location.href = data.session.url;
+      } else if (method === "cash" && data.status === "success") {
+        toast.success("Order created successfully");
+        window.location.href = "/allorders";
+      } else {
+        toast.error(data.message || "Checkout failed");
       }
-    );
-    const data = await response.json();
-    console.log("Online Payment Response:", data);
-
-    if (data.status === "success") {
-      window.location.href = data.session.url; 
-    }
-  }
-
-  async function checkoutCash() {
-    const shippingAddress = getShippingAddress();
-
-    const response = await fetch(
-      `https://ecommerce.routemisr.com/api/v1/orders/${cartId}`,
-      {
-        method: "POST",
-        body: JSON.stringify({ shippingAddress }),
-        headers: {
-          token,
-          "content-type": "application/json",
-        },
-      }
-    );
-    const data = await response.json();
-    console.log("Cash Payment Response:", data);
-
-    if (data.status === "success") {
-      toast.success("Order created successfuly");
-       window.location.href = "/allorders"; 
+    } catch (err) {
+      console.error("❌ Checkout client error:", err);
+      toast.error("Something went wrong");
     }
   }
 
@@ -100,37 +72,34 @@ export default function Checkout({ cartId }: { cartId: string }) {
               placeholder="Street, Building, etc."
             />
           </div>
-
           <div className="grid gap-2">
             <Label htmlFor="city">City</Label>
             <Input ref={cityInput} id="city" placeholder="e.g. Cairo" />
           </div>
-
           <div className="grid gap-2">
             <Label htmlFor="phone">Phone</Label>
             <Input ref={phoneInput} id="phone" placeholder="+20 100 000 0000" />
           </div>
         </div>
 
-      <DialogFooter>
-  <div className="flex flex-col w-full gap-2">
-    <Button
-      onClick={checkoutOnline}
-      type="button"
-      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-    >
-      Pay Online
-    </Button>
-    <Button
-      onClick={checkoutCash}
-      type="button"
-      className="w-full bg-green-600 hover:bg-green-700 text-white"
-    >
-      Pay Cash on Delivery
-    </Button>
-  </div>
-</DialogFooter>
-
+        <DialogFooter>
+          <div className="flex flex-col w-full gap-2">
+            <Button
+              onClick={() => checkout("online")}
+              type="button"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Pay Online
+            </Button>
+            <Button
+              onClick={() => checkout("cash")}
+              type="button"
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              Pay Cash on Delivery
+            </Button>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

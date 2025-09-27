@@ -23,12 +23,21 @@ export default function RegisterPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+      const passwordRegex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     e.preventDefault();
+
 
     if (formData.password !== formData.rePassword) {
       toast.error("Passwords do not match!");
       return;
     }
+     if (!passwordRegex.test(formData.password)) {
+    toast.error(
+      "Password must be at least 8 characters, include a letter, a number, and a special character."
+    );
+    return;
+  }
 
     setIsLoading(true);
     try {
