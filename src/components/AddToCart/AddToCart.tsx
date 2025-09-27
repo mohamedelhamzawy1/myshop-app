@@ -1,14 +1,13 @@
 "use client";
-import { Button } from '../ui/button';
-import { Loader2, ShoppingCart } from 'lucide-react';
-import { useContext, useState } from 'react';
-import toast from 'react-hot-toast';
-import { CartContext } from '../Context/cartContext';
-import WishlistButton from '../WishlistButton/WishlistButton';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { addToCartServer } from '@/app/(pages)/Products/_actions/addToCartActions';
-
+import { Button } from "../ui/button";
+import { Loader2, ShoppingCart } from "lucide-react";
+import { useContext, useState } from "react";
+import toast from "react-hot-toast";
+import { CartContext } from "../Context/cartContext";
+import WishlistButton from "../WishlistButton/WishlistButton";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { addToCartServer } from "@/app/(pages)/Products/_actions/addToCartActions";
 
 export default function AddToCart({ productId }: { productId: string }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,8 +16,8 @@ export default function AddToCart({ productId }: { productId: string }) {
   const router = useRouter();
 
   async function handleAddToCart() {
-    if (session.status !== 'authenticated') {
-      router.push('/login');
+    if (session.status !== "authenticated") {
+      router.push("/login");
       return;
     }
 
@@ -26,11 +25,11 @@ export default function AddToCart({ productId }: { productId: string }) {
     const data = await addToCartServer(productId);
     setIsLoading(false);
 
-    if (data.status === 'success') {
-      toast.success(data.message);
-      await getCart();
+    if (data?.status === "success") {
+      toast.success(data.message || "Added to cart");
+      await getCart(); // refresh cart context
     } else {
-      toast.error(data.message);
+      toast.error(data?.message || "Failed to add to cart");
     }
   }
 
@@ -41,7 +40,8 @@ export default function AddToCart({ productId }: { productId: string }) {
         onClick={handleAddToCart}
         className="flex-grow flex items-center justify-center gap-2 cursor-pointer"
       >
-        {isLoading ? <Loader2 className="animate-spin" /> : <ShoppingCart />} Add To Cart
+        {isLoading ? <Loader2 className="animate-spin" /> : <ShoppingCart />}{" "}
+        Add To Cart
       </Button>
       <WishlistButton productId={productId} />
     </div>

@@ -1,34 +1,27 @@
-"use server"
-import { cookies } from "next/headers";
-import { decode } from "next-auth/jwt";
+"use server";
+
 import { getUserToken } from "@/types/getUserToken/getUserToken";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://ecommerce.routemisr.com/api/v1";
 
 export async function addToCartServer(productId: string) {
   try {
+    const token = await getUserToken();
 
-    const token=await getUserToken()
-
-    // Use raw cookie token, do NOT decode it
-    const res = await fetch("https://ecommerce.routemisr.com/api/v1/cart", {
+    const res = await fetch(`${API_URL}/cart`, {
       method: "POST",
-      body:JSON.stringify({productId}),
+      body: JSON.stringify({ productId }),
       headers: {
         "Content-Type": "application/json",
-        token: token+'',  // <-- use raw token
+        token: token + "",
       },
-     
     });
 
-    const data = await res.json();
-    return data;
+    return await res.json();
   } catch (err: unknown) {
-    
-  if (err instanceof Error) {
-    return { status: "error", message: err.message };
+    if (err instanceof Error) {
+      return { status: "error", message: err.message };
+    }
+    return { status: "error", message: String(err) };
   }
-  return { status: "error", message: String(err) };
 }
-
-}
-
-

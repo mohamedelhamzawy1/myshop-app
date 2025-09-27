@@ -5,7 +5,7 @@ export async function removeFromWishlistServer(productId: string) {
   try {
     const token = await getUserToken();
     const res = await fetch(
-      `https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/wishlist/${productId}`,
       {
         method: "DELETE",
         headers: { token: token + "" },
@@ -14,6 +14,7 @@ export async function removeFromWishlistServer(productId: string) {
 
     return await res.json();
   } catch (err: any) {
+    console.error("Error in removeFromWishlistServer:", err);
     return { status: "error", message: err.message || String(err) };
   }
 }
