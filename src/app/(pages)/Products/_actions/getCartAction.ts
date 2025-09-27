@@ -3,32 +3,23 @@ import { getUserToken } from "@/types/getUserToken/getUserToken";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://ecommerce.routemisr.com/api/v1";
 
-function maskToken(t?: string | null) {
-  if (!t) return null;
-  if (t.length <= 12) return t;
-  return `${t.slice(0, 6)}...${t.slice(-6)}`;
-}
-
 export async function getCartServer() {
   try {
     const token = await getUserToken();
-    console.log("[getCartServer] token (masked):", maskToken(token));
+    console.log("[getCartServer] token:", token);
+
+    if (!token) return { status: "error", message: "No valid token found" };
 
     const res = await fetch(`${API_URL}/cart`, {
-      headers: { token: token + "" },
+      headers: { token },
       cache: "no-store",
     });
 
-    const text = await res.text();
-    console.log("[getCartServer] API status:", res.status, "body:", text);
-
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { status: "error", message: text };
-    }
+    const data = await res.json();
+    console.log("[getCartServer] response:", data);
+    return data;
   } catch (err: any) {
-    console.error("[getCartServer] Error:", err);
+    console.error("[getCartServer] error:", err);
     return { status: "error", message: err.message || String(err) };
   }
 }

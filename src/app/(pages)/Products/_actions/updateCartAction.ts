@@ -1,5 +1,4 @@
 "use server";
-
 import { getUserToken } from "@/types/getUserToken/getUserToken";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://ecommerce.routemisr.com/api/v1";
@@ -7,18 +6,24 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://ecommerce.routemisr.
 export async function updateCartServer(productId: string, count: number) {
   try {
     const token = await getUserToken();
+    console.log("[updateCartServer] token:", token);
+
+    if (!token) return { status: "error", message: "No valid token found" };
 
     const res = await fetch(`${API_URL}/cart/${productId}`, {
       method: "PUT",
-      body: JSON.stringify({ count }),
       headers: {
         "Content-Type": "application/json",
-        token: token + "",
+        token,
       },
+      body: JSON.stringify({ count }),
     });
 
-    return await res.json();
+    const data = await res.json();
+    console.log("[updateCartServer] response:", data);
+    return data;
   } catch (err: any) {
+    console.error("[updateCartServer] error:", err);
     return { status: "error", message: err.message || String(err) };
   }
 }
